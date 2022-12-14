@@ -33,9 +33,20 @@ def parse_move(move_txt: str) -> Move:
 
 def perform_move(stacks: list[list[str]], move: Move) -> None:
     """Pop and push from dest and src by count times specified in `move`."""
+    dest, src = move.dest-1, move.src-1
     for _ in range(move.count):
-        dest, src = move.dest-1, move.src-1
         stacks[dest].append(stacks[src].pop())
+        
+def perform_move_v2(stacks: list[list[str]], move: Move) -> None:
+    """Transfer count crates in-order from dest and src specified in `move`."""
+    dest, src = move.dest-1, move.src-1
+    temp = []
+    for _ in range(move.count):
+        temp.append(stacks[src].pop())
+    for _ in range(move.count):
+        stacks[dest].append(temp.pop())
+        
+
         
 
 def get_top_of_stacks(stacks: list[list[str]]) -> str:
@@ -70,4 +81,16 @@ def part_two_answer() -> int:
     """
     Advent of Code Part One Answer.
     """
-    None
+    with open("05/input.txt", "r") as f:
+        lines = f.readlines()
+        
+    end_of_init_idx = lines.index('\n')
+    
+    init_map = lines[:end_of_init_idx]
+    move_list = lines[end_of_init_idx+1:]
+    stacks = init_stacks(init_map)
+    
+    for move in (parse_move(m) for m in move_list):
+        perform_move_v2(stacks, move)
+
+    return get_top_of_stacks(stacks)
