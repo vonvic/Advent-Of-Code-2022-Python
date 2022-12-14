@@ -77,7 +77,27 @@ def get_opp_move_from_letter(letter: str):
         case 'C':
             return 'scissor'
 
-
+def get_player_move_from_opponent(outcome_letter: str, opponent_move: str):
+    """Return player move from letter."""
+    player_letter: str
+    match outcome_letter:
+        case 'X':
+            if opponent_move == 'rock':
+                player_letter = 'scissor'
+            elif opponent_move == 'paper':
+                player_letter = 'rock'
+            elif opponent_move == 'scissor':
+                player_letter = 'paper'
+        case 'Y':
+            player_letter = opponent_move
+        case 'Z':
+            if opponent_move == 'rock':
+                player_letter = 'paper'
+            elif opponent_move == 'paper':
+                player_letter = 'scissor'
+            elif opponent_move == 'scissor':
+                player_letter = 'rock'
+    return player_letter
 
 def part_one_answer() -> int:
     """
@@ -97,4 +117,11 @@ def part_two_answer() -> int:
     """
     Advent of Code Part One Answer.
     """
-    None
+    score = 0
+    with open("02/input.txt", "r") as f:
+        for line in f:
+            opp, outcome = line.strip().split(' ')
+            opp = get_opp_move_from_letter(opp)
+            you = get_player_move_from_opponent(outcome, opp)
+            score += _play(opp, you)
+    return score
