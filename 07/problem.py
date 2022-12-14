@@ -92,10 +92,8 @@ def sum_of_dir_at_most_size(dir: Directory, max_size: int) -> int:
     return size_sum
 
 
-def part_one_answer() -> int:
-    """
-    Advent of Code Part One Answer.
-    """
+def get_file_system() -> Directory:
+    """Return the root of the filesystem."""
     curr_dir: Directory = Directory('/')
     with open("07/input.txt", "r") as f:
         for line in (l.strip() for l in f):
@@ -132,6 +130,37 @@ def part_one_answer() -> int:
                         new_reg_file = RegularFile(filename, size)
                         curr_dir.add(new_reg_file)
     root = get_root_from_dir(curr_dir)
+    return root
+
+
+def find_smallest_dir_to_delete(root: Directory, total_size: int, target_unused: int) -> Directory:
+    """Find the smallest directory to delete."""
+    total_unused_space = total_size - root.size
+    frontier: list[Directory] = [root]
+    smallest_dir: Directory = root
+    while len(frontier) > 0:
+        dir: Directory = frontier.pop()
+        
+        free_space_after_delete_curr_dir = total_unused_space + dir.size
+        
+        if free_space_after_delete_curr_dir < target_unused:
+            continue
+        
+        smallest_dir = dir if dir.size < smallest_dir.size else smallest_dir
+        
+        for file in dir.contents:
+            if not isinstance(file, Directory):
+                continue
+            frontier.append(file)
+    return smallest_dir
+        
+
+
+def part_one_answer() -> int:
+    """
+    Advent of Code Part One Answer.
+    """
+    root = get_file_system()
     return sum_of_dir_at_most_size(root, 100000)
 
 
@@ -139,4 +168,8 @@ def part_two_answer() -> int:
     """
     Advent of Code Part One Answer.
     """
-    None
+    root = get_file_system()
+    total_size = 70000000
+    target_unused = 30000000
+    chosen_directory_to_delete = find_smallest_dir_to_delete(root, total_size, target_unused)
+    return chosen_directory_to_delete.size
